@@ -82,6 +82,5 @@ resource "google_project_iam_member" "composer-worker" {
     "roles/bigquery.admin",
   ])
   role    = each.key
-  # role   = "roles/composer.worker"
   member  = "serviceAccount:${google_service_account.composer_service_account.email}"
 }
