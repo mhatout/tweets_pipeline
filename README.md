@@ -41,13 +41,13 @@ I have created a an Airflow DAG that will create a dataproc cluster and run the 
     * bigquery: create 4 tables in data warehouse containing the insights extracted from the datafram.
  * delete_dataproc_cluster:
     * Delete the Dataproc cluster after finishing all the jobs submitted to avoid any unnecessary costs.      
-<img alt = "image" src = "https://drive.google.com/file/d/1VsI3zNzBY3Yp4Roy2RLx0ql5rJIL4MW5/view?usp=sharing">
+<img alt = "image" src = "https://i.ibb.co/zswN4FF/tweets-dag.png">
 
 ## Data Visualization
 I created a visualization dashboard consest of 4 tiles showing the end result of the project. <br>
 Tweets Sentiment Analysis Dashboard: [url](https://datastudio.google.com/reporting/931e263a-3c17-45f3-b03a-12c4f1193262/page/Fl5pC)
 
-<img alt = "image" src = "https://drive.google.com/file/d/1BmlA5hSdeSHkrXA3rjBxlypveibtmeyh/view?usp=sharing">
+<img alt = "image" src = "https://i.ibb.co/4McMtSg/tweets-setiment-dashboard.png">
 
 ## Reproductivity
 
@@ -80,7 +80,7 @@ gsutil cp path_to_the_project/tweets_pipeline/airflow/scripts/pip-install.sh gs:
 gsutil cp path_to_the_project/tweets_pipeline/airflow/dags/pipeline_dag.py gs://CLOUD_COMPOSER_BUCKET/dags/
 ```
 > You can find the Airflow dag floder by going to Cloud Composer page and clicking on the "DAGs" tab and you can access Airflow UI web server by clicking on "Airflow" tab.
-<img alt = "image" src = "https://drive.google.com/file/d/10JUO7stYKZxPo3X5WibMmfIZBLHtZpl-/view?usp=sharing">
+<img alt = "image" src = "https://i.ibb.co/4VnJcFF/composer-dags.png">
 
 * Copy the Airflow dag tasks into GS bucket.
 ```console
