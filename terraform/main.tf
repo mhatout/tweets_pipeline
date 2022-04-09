@@ -22,7 +22,6 @@ resource "google_storage_bucket" "data-lake-bucket" {
 
   # Optional, but recommended settings:
   storage_class = var.storage_class
-  # uniform_bucket_level_access = true
 
   versioning {
     enabled     = true
@@ -33,7 +32,7 @@ resource "google_storage_bucket" "data-lake-bucket" {
       type = "Delete"
     }
     condition {
-      age = 60  // days
+      age = 90  // days
     }
   }
 
@@ -55,34 +54,19 @@ resource "google_composer_environment" "airflow" {
     node_count = 4
     software_config {
       image_version = "composer-1.18.3-airflow-2.2.3"
+      env_variables = {
+        project = var.project
+        region = var.dataproc_region
+        bq_dataset = var.BQ_DATASET
+        gs_bucket = "${local.data_lake_bucket}_${var.project}"
+        data_source=var.data_source
+      }
     }
     node_config {
-      # machine_type = "n1-standard-1"
-      # network    = google_compute_network.composer-network.id
-      # subnetwork = google_compute_subnetwork.composer-subnetwork.id
       service_account = google_service_account.composer_service_account.name	
     }
-    # database_config {
-    #   machine_type = "db-n1-standard-2"
-    # }
-
-    # web_server_config {
-    #   machine_type = "composer-n1-webserver-2"
-    # }
   }
 }
-
-# resource "google_compute_network" "composer-network" {
-#   name                    = "composer-network"
-#   auto_create_subnetworks = false
-# }
-
-# resource "google_compute_subnetwork" "composer-subnetwork" {
-#   name          = "composer-subnetwork"
-#   ip_cidr_range = "10.2.0.0/24"
-#   region        = var.region
-#   network       = google_compute_network.composer-network.id
-# }
 
 resource "google_service_account" "composer_service_account" {
   account_id   = "composer-env-account"
@@ -91,48 +75,13 @@ resource "google_service_account" "composer_service_account" {
 
 resource "google_project_iam_member" "composer-worker" {
   project = var.project
-  # for_each = toset([
-  #   "roles/resourcemanager.projectIamAdmin",
-  #   "roles/owner",
-  #   "roles/composer.admin",
-  #   "roles/composer.ServiceAgentV2Ext",
-  # ])
-  # role    = each.key
-  role   = "roles/composer.worker"
+  for_each = toset([
+    "roles/composer.worker",
+    "roles/dataproc.admin",
+    "roles/iam.serviceAccountUser",
+    "roles/bigquery.admin",
+  ])
+  role    = each.key
+  # role   = "roles/composer.worker"
   member  = "serviceAccount:${google_service_account.composer_service_account.email}"
 }
-
-# resource "google_project_iam_policy" "composer-worker" {
-#   project = var.project
-#   policy_data = data.google_iam_policy.composer2.policy_data
-# }
-
-# data "google_iam_policy" "composer2" {
-
-#   # IMPORTANT: Include all other IAM bindings for your project.
-#   # Existing IAM policy in your project is overwritten with parameters
-#   # specified here.
-
-#   binding {
-#     role = "roles/composer.ServiceAgentV2Ext"
-
-#     members = [
-#       "serviceAccount:service-476527518525@cloudcomposer-accounts.iam.gserviceaccount.com",
-#     ]
-#   }
-
-#   binding {
-#     role = "roles/composer.admin"
-
-#     members = [
-#       "serviceAccount:service-476527518525@cloudcomposer-accounts.iam.gserviceaccount.com",
-#     ]
-#   }
-
-#   # Edit the section below along with the example binding to match your
-#   # project's IAM policy.
-#   binding {
-#     role = "roles/owner"
-#     members = ["serviceAccount:service-476527518525@cloudcomposer-accounts.iam.gserviceaccount.com"]
-#   }
-# }
